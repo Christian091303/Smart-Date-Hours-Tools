@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hours Calculator Tools</title>
+  <style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #ffffff url("egghead arc.jpg") center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;   
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px 35px;
+  border-radius: 30px;
+  width: 500px;
+  max-width: 100%;        
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  margin-top: 50px;      
+  margin-bottom: 120px; 
+}
+
+h2 {
+  font-size: 45px;
+  color:#000000;
+  font-family: "Times New Roman", Times, serif;
+  margin: 0;
+  padding: 10px 80px;
+  padding-bottom: 40px;
+}
+
+.title-wrapper {
+  display: flex;
+  flex-direction: column;  
+  align-items: flex-end; 
+  margin-bottom: 20px;  
+  gap: 10px;              
+}
+
+.title-wrapper button {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.2);   
+  backdrop-filter: blur(8px);             
+  -webkit-backdrop-filter: blur(8px);     
+  color: #000000;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight:bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.title-wrapper button:hover {
+  background: rgba(255, 255, 255, 0.4);   
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); 
+  transform: translateY(-2px);   
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+input[type="time"] {
+  width: 80%;
+  padding: 10px 35px 10px 10px;
+  border: none;
+  border-radius: 15px;
+  font-size: 15px;
+  background: rgba(255,255,255,0.3);
+  transition: all 0.3s ease;
+}
+
+input[type="time"]:focus {
+  outline: none;
+  background: rgba(255,255,255,0.5);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+.remove-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-container button {
+  margin-top: 35px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);   
+  backdrop-filter: blur(8px);             
+  -webkit-backdrop-filter: blur(8px);     
+  color: #000000;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight:lighter;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-container button:hover {
+  background: rgba(255, 255, 255, 0.4);  
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); 
+  transform: translateY(-2px);         
+}
+
+.result {
+  margin: 25px auto;        /* auto horizontal margin para center */
+  font-size: 18px;
+  color: #000000;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 15px;
+  width: 40%;
+  text-align: center;       /* text sa loob naka-center din */
+  display: block;           /* siguradong block element */
+}
+
+footer {
+  padding-top: 35px;
+  color: #000000;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  h2 {
+    font-size: 28px;
+  }
+  .container {
+    padding: 20px;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 22px;
+  }
+  .container {
+    padding: 15px;
+    border-radius: 15px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="title-wrapper">
+      <h2>Hours Calculator</h2>
+      <button onclick="backtoindex()">Back to Home</button>
+      <button onclick="goToConverter()">Go to Date Converter</button>
+    </div>
+    
+    <div id="timeRows">
+      <div class="time-row">
+        <div class="input-wrapper">
+          <input type="time" class="start">
+        </div>
+        <div class="input-wrapper">
+          <input type="time" class="end">
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button onclick="addRow()">Add Time</button>
+      <button onclick="calculateTotal()">Compute Totals</button>
+      <button onclick="resetForm()">Reset</button>
+    </div>
+
+    <div class="result" id="output"></div>
+
+  <footer>
+      by: Gil Christian B. Alamillo Hours Calculator | © 2026 All Rights Reserved.
+  </footer>
+  </div>
+
+  <script>
+   function goToConverter() {
+  window.location.href = "Auto Date Converter.html"; 
+}
+
+function backtoindex() {
+    window.location.href = "index.html";
+  }
+function addRow() {
+  let container = document.getElementById("timeRows");
+  let row = document.createElement("div");
+  row.className = "time-row";
+  row.innerHTML = `
+    <div class="input-wrapper">
+      <input type="time" class="start">
+    </div>
+    <div class="input-wrapper">
+      <input type="time" class="end">
+      <button class="remove-btn">❌</button>
+    </div>
+  `;
+
+  let removeBtn = row.querySelector(".remove-btn");
+  removeBtn.addEventListener("click", () => {
+    container.removeChild(row);
+  });
+
+  container.appendChild(row);
+}
+
+function calculateTotal() {
+  let starts = document.querySelectorAll(".start");
+  let ends = document.querySelectorAll(".end");
+  let totalMs = 0;
+
+  for (let i = 0; i < starts.length; i++) {
+    let start = starts[i].value;
+    let end = ends[i].value;
+    if (!start || !end) continue;
+
+    let startDate = new Date("1970-01-01T" + start + ":00");
+    let endDate = new Date("1970-01-01T" + end + ":00");
+
+    if (endDate < startDate) {
+      endDate.setDate(endDate.getDate() + 1);
+    }
+
+    totalMs += (endDate - startDate);
+  }
+
+  let diffHrs = Math.floor(totalMs / (1000 * 60 * 60));
+  let diffMins = Math.floor((totalMs / (1000 * 60)) % 60);
+
+  document.getElementById("output").innerText = 
+    `Total Time: ${diffHrs} hrs ${diffMins} mins`;
+}
+
+function resetForm() {
+  document.getElementById("timeRows").innerHTML = `
+    <div class="time-row">
+      <div class="input-wrapper">
+        <input type="time" class="start">
+      </div>
+      <div class="input-wrapper">
+        <input type="time" class="end">
+      </div>
+    </div>
+  `;
+  document.getElementById("output").innerText = "";
+}
+  </script>
+</body>
+</html>

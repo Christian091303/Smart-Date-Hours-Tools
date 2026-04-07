@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Date Converter Tools</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h2>Date Converter</h2>
+
+  <div class="title-wrapper">
+    <button onclick="backtoindex()">Back to Home</button>
+    <button onclick="goToHoursCalculator()">Go to Hours Calculator</button>
+  </div>
+
+  <input type="text" id="value" placeholder="Enter 1 Year, 1 Months, 1 Weeks, 1 Days">
+
+  <div class="btn-group">
+    <button id="mainBtn" onclick="convert()">Convert</button>
+  </div>
+
+  <div class="result" id="output"></div>
+
+  <footer>
+    by: Gil Christian B. Alamillo Hours Calculator | © 2026 All Rights Reserved.
+  </footer>
+  </div>
+
+  <script>
+function goToHoursCalculator() {
+  window.location.href = "Hours Calculator.html"; 
+}
+
+function backtoindex() {
+    window.location.href = "index.html";
+  }
+
+function convert() {
+  let rawInput = document.getElementById('value').value.trim().toLowerCase();
+  let output = document.getElementById('output');
+
+  if (!rawInput) {
+    output.innerHTML = "Please enter a value like 1 Year, 12 Months, 1 Weeks, 1 Days";
+    return;
+  }
+
+  const yearMatch = rawInput.match(/(\d+)\s*year/);
+  const monthMatch = rawInput.match(/(\d+)\s*month/);
+  const weekMatch = rawInput.match(/(\d+)\s*week/);
+  const dayMatch = rawInput.match(/(\d+)\s*day/);
+
+  let years = yearMatch ? parseInt(yearMatch[1]) : 0;
+  let months = monthMatch ? parseInt(monthMatch[1]) : 0;
+  let weeks = weekMatch ? parseInt(weekMatch[1]) : 0;
+  let days = dayMatch ? parseInt(dayMatch[1]) : 0;
+  let breakdown = [];
+
+  if (years > 0) breakdown.push(`${years} ${years === 1 ? "Year" : "Years"} = ${years*12} Months, ${years*365} Days`);
+  if (months > 0) breakdown.push(`${months} ${months === 1 ? "Month" : "Months"} ≈ ${months*30} Days`);
+  if (weeks > 0) breakdown.push(`${weeks} ${weeks === 1 ? "Week" : "Weeks"} = ${weeks*7} Days`);
+  if (days > 0) breakdown.push(`${days} ${days === 1 ? "Day" : "Days"}`);
+
+  let startDate = new Date();
+  let resultDate = new Date(startDate);
+  resultDate.setFullYear(resultDate.getFullYear() + years);
+  resultDate.setMonth(resultDate.getMonth() + months);
+  resultDate.setDate(resultDate.getDate() + (weeks*7) + days);
+
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedStart = startDate.toLocaleDateString('en-US', options);
+  const formattedResult = resultDate.toLocaleDateString('en-US', options);
+
+  output.innerHTML = `
+    Breakdown:<br>${breakdown.join("<br>")}<br><br>
+    Starting Date: ${formattedStart}<br>
+    Result Date: <strong>${formattedResult}</strong>
+  `;
+
+  let btn = document.getElementById("mainBtn");
+  btn.innerText = "Reset";
+  btn.onclick = RESET;
+}
+
+function RESET() {
+  document.getElementById('value').value = "";
+  document.getElementById('output').innerHTML = "";
+
+  let btn = document.getElementById("mainBtn");
+  btn.innerText = "Convert";
+  btn.onclick = convert;
+}
+</script>
+</body>
+</html>
