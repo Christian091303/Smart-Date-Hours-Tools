@@ -230,8 +230,11 @@ function convert() {
       const weeksFromMonths = Math.floor(totalDays / 7);
       const daysFromMonths = totalDays % 7;
       breakdown.push(`${remainingMonths} Months = ${weeksFromMonths} Weeks${daysFromMonths > 0 ? `, ${daysFromMonths} Days` : ""}`);
+    } else if (remainingMonths === 1) {
+      breakdown.push("1 Month");
+    }
   }
-
+  
   if (weeks > 0) {
     const totalDays = weeks * 7;
     const monthsFromWeeks = Math.floor(totalDays / 30);
