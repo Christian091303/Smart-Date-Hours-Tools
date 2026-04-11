@@ -224,12 +224,20 @@ if (years > 0) {
 }
 
 if (months > 0) {
-  const totalDays = months * 30; 
-  const weeksFromMonths = Math.floor(totalDays / 7);
-  const daysFromMonths = totalDays % 7;
-  breakdown.push(
-    `${months} ${months === 1 ? "Month" : "Months"} = ${weeksFromMonths} Weeks, ${daysFromMonths} Days`
-  );
+  // convert months to years + remaining months
+  const yearsFromMonths = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
+  if (yearsFromMonths > 0) {
+    breakdown.push(`${months} ${months === 1 ? "Month" : "Months"} = ${yearsFromMonths} ${yearsFromMonths === 1 ? "Year" : "Years"}${remainingMonths > 0 ? `, ${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}` : ""}`);
+  }
+
+  if (remainingMonths > 0) {
+    const totalDays = remainingMonths * 30; // assume 30 days per month
+    const weeksFromMonths = Math.floor(totalDays / 7);
+    const daysFromMonths = totalDays % 7;
+    breakdown.push(`${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"} = ${weeksFromMonths} Weeks${daysFromMonths > 0 ? `, ${daysFromMonths} Days` : ""}`);
+  }
 }
 
 if (weeks > 0) {
