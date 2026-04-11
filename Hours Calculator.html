@@ -254,17 +254,17 @@ function backtoindex() {
 }
 
 function formatTime12h(timeStr) {
-  const [hours, minutes] = timeStr.split(":");
-  let h = parseInt(hours, 10);
-  const suffix = h >= 12 ? "PM" : "AM";
+  const [hour, minute] = timeStr.split(":");
+  let h = parseInt(hour, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
   h = h % 12 || 12;
-  return `${h.toString().padStart(2,"0")}:${minutes} ${suffix}`;
+  return `${h}:${minute} ${ampm}`;
 }
 
 function formatHoursToHM(hours) {
-  const h = Math.floor(hours); 
+  const h = Math.floor(hours);
   const m = Math.round((hours - h) * 60);
-  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} hr`;
+  return `${h}h ${m}m`;
 }
 
 function addRow() {
@@ -329,8 +329,11 @@ function calculateTotal() {
 
   document.getElementById("output").innerText = `Total Hours: ${formatHoursToHM(totalHours)}`;
 
-  document.getElementById("pdfBtnContainer").innerHTML =
-    '<button id="downloadPDF" class="btn">Download PDF</button>';
+  return totalHours;
+}
+
+document.getElementById("pdfBtnContainer").innerHTML =
+  '<button id="downloadPDF" class="btn">Download PDF</button>';
 
 const downloadBtn = document.getElementById("downloadPDF");
 if (downloadBtn) {
@@ -353,8 +356,22 @@ if (downloadBtn) {
     doc.text(`Name: ${userName}`, 14, 30);
     doc.text(`Role: ${userRole}`, 14, 38);
 
-    // Table + footer (same format as before)
-    doc.autoTable({ html: '#summaryTable', startY: 50 });
+    // Calculate total hours
+    const totalHours = calculateTotal();
+    const formattedTotal = formatHoursToHM(totalHours);
+
+    // Table + footer row with totals
+    doc.autoTable({
+      html: '#summaryTable',
+      startY: 50,
+      foot: [
+        [
+          { content: 'TOTAL HOURS', styles: { halign: 'right', fontStyle: 'bold' } },
+          { content: formattedTotal, styles: { halign: 'center', fontStyle: 'bold' } }
+        ]
+      ]
+    });
+
     const now = new Date();
     const dateStr = now.toLocaleString();
     doc.setFontSize(10);
@@ -366,7 +383,6 @@ if (downloadBtn) {
 
     doc.save(fileName);
   });
- }
 }
   </script>
 </body>
