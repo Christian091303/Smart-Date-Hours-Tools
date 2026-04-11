@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <meta charset="UTF-8">
   <title>Hours Calculator Tools</title>
   <style>
@@ -134,17 +136,37 @@ input[type="time"]:focus {
 }
 
 .result {
-  margin: 25px auto;        /* auto horizontal margin para center */
+  margin: 20px auto;       
   font-size: 18px;
   color: #000000;
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(6px);
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.3);
-  padding: 15px;
-  width: 40%;
-  text-align: center;       /* text sa loob naka-center din */
-  display: block;           /* siguradong block element */
+  padding: 10px 10px;
+  width: 35%;
+  text-align: center;      
+  display: block;           
+}
+
+#pdfBtnContainer button {
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.2);   
+  backdrop-filter: blur(8px);             
+  -webkit-backdrop-filter: blur(8px);     
+  color: #000000;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight:bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#pdfBtnContainer button:hover {
+  background: rgba(255, 255, 255, 0.4);  
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7); 
+  transform: translateY(-2px);         
 }
 
 footer {
@@ -203,6 +225,18 @@ footer {
     </div>
 
     <div class="result" id="output"></div>
+    <div id="pdfBtnContainer"></div>
+
+    <table id="summaryTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Total Hours</th>
+    </tr>
+  </thead>
+  <tbody id="summaryBody"></tbody>
+</table>
 
   <footer>
       by: Gil Christian B. Alamillo Hours Calculator | © 2026 All Rights Reserved.
@@ -210,13 +244,29 @@ footer {
   </div>
 
   <script>
-   function goToConverter() {
+
+function goToConverter() {
   window.location.href = "Auto Date Converter.html"; 
 }
 
 function backtoindex() {
-    window.location.href = "index.html";
-  }
+  window.location.href = "index.html";
+}
+
+function formatTime12h(timeStr) {
+  const [hours, minutes] = timeStr.split(":");
+  let h = parseInt(hours, 10);
+  const suffix = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h.toString().padStart(2,"0")}:${minutes} ${suffix}`;
+}
+
+function formatHoursToHM(hours) {
+  const h = Math.floor(hours); 
+  const m = Math.round((hours - h) * 60);
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} hr`;
+}
+
 function addRow() {
   let container = document.getElementById("timeRows");
   let row = document.createElement("div");
@@ -239,45 +289,84 @@ function addRow() {
   container.appendChild(row);
 }
 
-function calculateTotal() {
-  let starts = document.querySelectorAll(".start");
-  let ends = document.querySelectorAll(".end");
-  let totalMs = 0;
-
-  for (let i = 0; i < starts.length; i++) {
-    let start = starts[i].value;
-    let end = ends[i].value;
-    if (!start || !end) continue;
-
-    let startDate = new Date("1970-01-01T" + start + ":00");
-    let endDate = new Date("1970-01-01T" + end + ":00");
-
-    if (endDate < startDate) {
-      endDate.setDate(endDate.getDate() + 1);
-    }
-
-    totalMs += (endDate - startDate);
-  }
-
-  let diffHrs = Math.floor(totalMs / (1000 * 60 * 60));
-  let diffMins = Math.floor((totalMs / (1000 * 60)) % 60);
-
-  document.getElementById("output").innerText = 
-    `Total Time: ${diffHrs} hrs ${diffMins} mins`;
-}
-
 function resetForm() {
   document.getElementById("timeRows").innerHTML = `
     <div class="time-row">
-      <div class="input-wrapper">
-        <input type="time" class="start">
-      </div>
-      <div class="input-wrapper">
-        <input type="time" class="end">
-      </div>
+      <div class="input-wrapper"><input type="time" class="start"></div>
+      <div class="input-wrapper"><input type="time" class="end"></div>
     </div>
   `;
   document.getElementById("output").innerText = "";
+  document.getElementById("pdfBtnContainer").innerHTML = "";
+}
+
+function calculateTotal() {
+  const rows = document.querySelectorAll("#timeRows .time-row");
+  let totalHours = 0;
+  const summaryBody = document.getElementById("summaryBody");
+  summaryBody.innerHTML = "";
+
+  rows.forEach(row => {
+    const start = row.querySelector(".start").value;
+    const end = row.querySelector(".end").value;
+    if (start && end) {
+      let startDate = new Date(`1970-01-01T${start}:00`);
+      let endDate = new Date(`1970-01-01T${end}:00`);
+
+      // handle overnight shift
+      if (endDate < startDate) {
+        endDate.setDate(endDate.getDate() + 1);
+      }
+
+      const diff = (endDate - startDate) / (1000 * 60 * 60);
+      totalHours += diff;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${formatTime12h(start)}</td><td>${formatTime12h(end)}</td><td>${diff.toFixed(2)}</td>`;
+      summaryBody.appendChild(tr);
+    }
+  });
+
+  document.getElementById("output").innerText = `Total Hours: ${formatHoursToHM(totalHours)}`;
+
+  document.getElementById("pdfBtnContainer").innerHTML =
+    '<button id="downloadPDF" class="btn">Download PDF</button>';
+
+const downloadBtn = document.getElementById("downloadPDF");
+if (downloadBtn) {
+  downloadBtn.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const userName = prompt("Enter your Name:", "");
+    const userRole = prompt("Enter your Role:", "");
+
+    doc.setFontSize(25);
+    doc.setFont("helvetica", "bold");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const title = "Work Hours Summary Report";
+    const textWidth = doc.getTextWidth(title);
+    const xPos = (pageWidth - textWidth) / 2;
+    doc.text(title, xPos, 20);
+
+    doc.setFontSize(12);
+    doc.text(`Name: ${userName}`, 14, 30);
+    doc.text(`Role: ${userRole}`, 14, 38);
+
+    // Table + footer (same format as before)
+    doc.autoTable({ html: '#summaryTable', startY: 50 });
+    const now = new Date();
+    const dateStr = now.toLocaleString();
+    doc.setFontSize(10);
+    doc.text(`Generated: ${dateStr}`, 14, doc.internal.pageSize.height - 10);
+
+    const safeName = userName.replace(/\s+/g, "_");
+    const fileDate = now.toISOString().split("T")[0];
+    const fileName = `${safeName}_Work_Hours_Summary_${fileDate}.pdf`;
+
+    doc.save(fileName);
+  });
+ }
 }
   </script>
 </body>
