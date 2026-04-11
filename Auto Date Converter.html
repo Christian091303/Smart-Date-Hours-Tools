@@ -197,7 +197,7 @@ function convert() {
   let output = document.getElementById('output');
 
   if (!rawInput) {
-    output.innerHTML = "Please enter a value like 1 Year, 12 Months, 1 Weeks, 1 Days";
+    output.innerHTML = "Please enter a value like 1 Year, 12 Months, 1 Week, 1 Day";
     return;
   }
 
@@ -212,53 +212,57 @@ function convert() {
   let days = dayMatch ? parseInt(dayMatch[1]) : 0;
   let breakdown = [];
 
-if (years > 0) {
-  const monthsFromYears = years * 12; 
-  const totalDays = years * 365;   
-  const weeksFromYears = Math.floor(totalDays / 7);
-  const daysFromYears = totalDays % 7;
-
-  breakdown.push(
-    `${years} ${years === 1 ? "Year" : "Years"} = ${monthsFromYears} Months`
-  );
-}
-
-if (months > 0) {
-  // convert months to years + remaining months
-  const yearsFromMonths = Math.floor(months / 12);
-  const remainingMonths = months % 12;
-
-  if (yearsFromMonths > 0) {
-    breakdown.push(`${months} ${months === 1 ? "Month" : "Months"} = ${yearsFromMonths} ${yearsFromMonths === 1 ? "Year" : "Years"}${remainingMonths > 0 ? `, ${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}` : ""}`);
+  if (years > 0) {
+    const monthsFromYears = years * 12;
+    breakdown.push(`${years} ${years === 1 ? "Year" : "Years"} = ${monthsFromYears} Months`);
   }
-}
 
-if (weeks > 0) {
-  const totalDays = weeks * 7;
-  const monthsFromWeeks = Math.floor(totalDays / 30);
-  const remainingDays = totalDays % 30;
+  // Months → Years + Remaining Months → Weeks + Days
+  if (months > 0) {
+    const yearsFromMonths = Math.floor(months / 12);
+    const remainingMonths = months % 12;
 
-  if (monthsFromWeeks > 0) {
-    breakdown.push(
-      `${weeks} ${weeks === 1 ? "Week" : "Weeks"} = ${monthsFromWeeks} ${monthsFromWeeks === 1 ? "Month" : "Months"}${remainingDays > 0 ? `, ${remainingDays} ${remainingDays === 1 ? "Day" : "Days"}` : ""}`
-    );
-  } else {
-    breakdown.push(`${weeks} ${weeks === 1 ? "Week" : "Weeks"} = ${totalDays} Days`);
+    if (yearsFromMonths > 0) {
+      breakdown.push(`${months} ${months === 1 ? "Month" : "Months"} = ${yearsFromMonths} ${yearsFromMonths === 1 ? "Year" : "Years"}${remainingMonths > 0 ? `, ${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}` : ""}`);
+    }
+
+    if (remainingMonths > 1) {
+      const totalDays = remainingMonths * 30;
+      const weeksFromMonths = Math.floor(totalDays / 7);
+      const daysFromMonths = totalDays % 7;
+      breakdown.push(`${remainingMonths} Months = ${weeksFromMonths} Weeks${daysFromMonths > 0 ? `, ${daysFromMonths} Days` : ""}`);
+    } else if (remainingMonths === 1) {
+      breakdown.push("1 Month");
+    }
   }
-}
 
-if (days > 0) {
-  const weeksFromDays = Math.floor(days / 7);
-  const remainingDays = days % 7;
+  if (weeks > 0) {
+    const totalDays = weeks * 7;
+    const monthsFromWeeks = Math.floor(totalDays / 30);
+    const remainingDays = totalDays % 30;
 
-  if (weeksFromDays > 0) {
-    breakdown.push(
-      `${days} ${days === 1 ? "Day" : "Days"} = ${weeksFromDays} ${weeksFromDays === 1 ? "Week" : "Weeks"}${remainingDays > 0 ? `, ${remainingDays} ${remainingDays === 1 ? "Day" : "Days"}` : ""}`
-    );
-  } else {
-    breakdown.push(`${days} ${days === 1 ? "Day" : "Days"}`);
+    if (monthsFromWeeks > 0) {
+      breakdown.push(`${weeks} ${weeks === 1 ? "Week" : "Weeks"} = ${monthsFromWeeks} ${monthsFromWeeks === 1 ? "Month" : "Months"}${remainingDays > 0 ? `, ${remainingDays} Days` : ""}`);
+    } else {
+      breakdown.push(`${weeks} ${weeks === 1 ? "Week" : "Weeks"} = ${totalDays} Days`);
+    }
   }
-}
+
+  if (days > 0) {
+    if (days >= 30) {
+      const monthsFromDays = Math.floor(days / 30);
+      const remainingDaysAfterMonths = days % 30;
+      breakdown.push(`${days} Days = ${monthsFromDays} ${monthsFromDays === 1 ? "Month" : "Months"}${remainingDaysAfterMonths > 0 ? `, ${remainingDaysAfterMonths} Days` : ""}`);
+    } else {
+      const weeksFromDays = Math.floor(days / 7);
+      const remainingDays = days % 7;
+      if (weeksFromDays > 0) {
+        breakdown.push(`${days} Days = ${weeksFromDays} ${weeksFromDays === 1 ? "Week" : "Weeks"}${remainingDays > 0 ? `, ${remainingDays} Days` : ""}`);
+      } else {
+        breakdown.push(`${days} Day`);
+      }
+    }
+  }
 
   let startDate = new Date();
   let resultDate = new Date(startDate);
