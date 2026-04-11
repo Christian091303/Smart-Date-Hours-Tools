@@ -217,23 +217,26 @@ function convert() {
     breakdown.push(`${years} ${years === 1 ? "Year" : "Years"} = ${monthsFromYears} Months`);
   }
 
-  if (months > 0) {
-    const yearsFromMonths = Math.floor(months / 12);
-    const remainingMonths = months % 12;
+if (months > 0) {
+  const yearsFromMonths = Math.floor(months / 12);
+  const remainingMonths = months % 12;
 
-    if (yearsFromMonths > 0) {
-      breakdown.push(`${months} ${months === 1 ? "Month" : "Months"} = ${yearsFromMonths} ${yearsFromMonths === 1 ? "Year" : "Years"}${remainingMonths > 0 ? `, ${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}` : ""}`);
-    }
-
-    if (remainingMonths > 1) {
-      const totalDays = remainingMonths * 30;
-      const weeksFromMonths = Math.floor(totalDays / 7);
-      const daysFromMonths = totalDays % 7;
-      breakdown.push(`${remainingMonths} Months = ${weeksFromMonths} Weeks${daysFromMonths > 0 ? `, ${daysFromMonths} Days` : ""}`);
-    } else if (remainingMonths === 1) {
-      breakdown.push("1 Month");
-    }
+  if (yearsFromMonths > 0) {
+    breakdown.push(
+      `${months} ${months === 1 ? "Month" : "Months"} = ${yearsFromMonths} ${yearsFromMonths === 1 ? "Year" : "Years"}${remainingMonths > 0 ? `, ${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}` : ""}`
+    );
   }
+
+  if (remainingMonths > 1) {
+    const totalDays = remainingMonths * 30;
+    const weeksFromMonths = Math.floor(totalDays / 7);
+    const daysFromMonths = totalDays % 7;
+    breakdown.push(
+      `${remainingMonths} Months = ${weeksFromMonths} Weeks${daysFromMonths > 0 ? `, ${daysFromMonths} Days` : ""}`
+    );
+  }
+
+}
   
   if (weeks > 0) {
     const totalDays = weeks * 7;
