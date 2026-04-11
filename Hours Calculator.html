@@ -252,21 +252,7 @@ function goToConverter() {
 function backtoindex() {
   window.location.href = "index.html";
 }
-
-function formatTime12h(timeStr) {
-  const [hour, minute] = timeStr.split(":");
-  let h = parseInt(hour, 10);
-  const ampm = h >= 12 ? "PM" : "AM";
-  h = h % 12 || 12;
-  return `${h}:${minute} ${ampm}`;
-}
-
-function formatHoursToHM(hours) {
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  return `${h}h ${m}m`;
-}
-
+    
 function addRow() {
   let container = document.getElementById("timeRows");
   let row = document.createElement("div");
@@ -300,6 +286,20 @@ function resetForm() {
   document.getElementById("pdfBtnContainer").innerHTML = "";
 }
 
+function formatTime12h(timeStr) {
+  const [hour, minute] = timeStr.split(":");
+  let h = parseInt(hour, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${minute} ${ampm}`;
+}
+
+function formatHoursToHM(hours) {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return `${h}h ${m}m`;
+}
+
 function calculateTotal() {
   const rows = document.querySelectorAll("#timeRows .time-row");
   let totalHours = 0;
@@ -327,8 +327,7 @@ function calculateTotal() {
     }
   });
 
-  document.getElementById("output").innerText = `Total Hours: ${formatHoursToHM(totalHours)}`;
-
+  document.getElementById("output").innerText = `Total: ${formatHoursToHM(totalHours)}`;
   return totalHours;
 }
 
@@ -356,21 +355,17 @@ if (downloadBtn) {
     doc.text(`Name: ${userName}`, 14, 30);
     doc.text(`Role: ${userRole}`, 14, 38);
 
-    // Calculate total hours
     const totalHours = calculateTotal();
     const formattedTotal = formatHoursToHM(totalHours);
 
-    // Table + footer row with totals
     doc.autoTable({
       html: '#summaryTable',
-      startY: 50,
-      foot: [
-        [
-          { content: 'TOTAL HOURS', styles: { halign: 'right', fontStyle: 'bold' } },
-          { content: formattedTotal, styles: { halign: 'center', fontStyle: 'bold' } }
-        ]
-      ]
+      startY: 50
     });
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total: ${formattedTotal}`, 14, doc.lastAutoTable.finalY + 10);
 
     const now = new Date();
     const dateStr = now.toLocaleString();
@@ -384,6 +379,7 @@ if (downloadBtn) {
     doc.save(fileName);
   });
 }
+
   </script>
 </body>
 </html>
