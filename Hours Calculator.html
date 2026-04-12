@@ -143,8 +143,8 @@ input[type="time"]:focus {
   backdrop-filter: blur(6px);
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.3);
-  padding: 10px 10px;
-  width: 35%;
+  padding: 10px 15px ;
+  width: 30%;
   text-align: center;      
   display: block;           
 }
@@ -180,8 +180,15 @@ footer {
     font-size: 28px;
   }
   .container {
-    padding: 20px;
+    padding: 20px 30px;   
     border-radius: 20px;
+  }
+  .btn-container button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  .result {
+    font-size: 16px;
   }
 }
 
@@ -190,8 +197,23 @@ footer {
     font-size: 22px;
   }
   .container {
-    padding: 15px;
+    padding: 15px 20px;  
     border-radius: 15px;
+  }
+  .btn-container {
+    flex-direction: column;   
+    align-items: stretch;
+  }
+  .btn-container button {
+    width: 100%;           
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  .result {
+    margin-left: 0;
+    text-align: center;
+    font-size: 15px;
+    margin-top: 10px;
   }
 }
 
@@ -223,7 +245,7 @@ footer {
       <button onclick="calculateTotal()">Compute Totals</button>
       <button onclick="resetForm()">Reset</button>
     </div>
-
+    
     <div class="result" id="output"></div>
     <div id="pdfBtnContainer"></div>
 
@@ -313,7 +335,6 @@ function calculateTotal() {
       let startDate = new Date(`1970-01-01T${start}:00`);
       let endDate = new Date(`1970-01-01T${end}:00`);
 
-      // handle overnight shift
       if (endDate < startDate) {
         endDate.setDate(endDate.getDate() + 1);
       }
@@ -328,17 +349,22 @@ function calculateTotal() {
   });
 
   document.getElementById("output").innerText = `Total: ${formatHoursToHM(totalHours)}`;
+
+  const pdfContainer = document.getElementById("pdfBtnContainer");
+  pdfContainer.innerHTML = "";
+
+  if (totalHours > 0) {
+    pdfContainer.innerHTML = '<button id="downloadPDF" class="btn">Download PDF</button>';
+    const downloadBtn = document.getElementById("downloadPDF");
+    downloadBtn.addEventListener("click", generatePDF);
+  }
+
   return totalHours;
 }
 
-document.getElementById("pdfBtnContainer").innerHTML =
-  '<button id="downloadPDF" class="btn">Download PDF</button>';
-
-const downloadBtn = document.getElementById("downloadPDF");
-if (downloadBtn) {
-  downloadBtn.addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
     const userName = prompt("Enter your Name:", "");
     const userRole = prompt("Enter your Role:", "");
@@ -377,8 +403,7 @@ if (downloadBtn) {
     const fileName = `${safeName}_Work_Hours_Summary_${fileDate}.pdf`;
 
     doc.save(fileName);
-  });
-}
+  }
 
   </script>
 </body>
