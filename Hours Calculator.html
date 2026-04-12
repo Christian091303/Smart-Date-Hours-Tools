@@ -143,8 +143,8 @@ input[type="time"]:focus {
   backdrop-filter: blur(6px);
   border-radius: 30px;
   border: 1px solid rgba(255,255,255,0.3);
-  padding: 10px 15px ;
-  width: 30%;
+  padding: 15px 15px ;
+  width: 40%;
   text-align: center;      
   display: block;           
 }
@@ -319,7 +319,9 @@ function formatTime12h(timeStr) {
 function formatHoursToHM(hours) {
   const h = Math.floor(hours);
   const m = Math.round((hours - h) * 60);
-  return `${h}h ${m}m`;
+  const hLabel = h === 1 ? "hr" : "hrs";
+  const mLabel = m === 1 ? "min" : "mins";
+  return `${h} ${hLabel} ${m} ${mLabel}`;
 }
 
 function calculateTotal() {
@@ -343,7 +345,9 @@ function calculateTotal() {
       totalHours += diff;
 
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${formatTime12h(start)}</td><td>${formatTime12h(end)}</td><td>${diff.toFixed(2)}</td>`;
+      tr.innerHTML = `<td>${formatTime12h(start)}</td>
+                      <td>${formatTime12h(end)}</td>
+                      <td>${formatHoursToHM(diff)}</td>`; // <-- formatted
       summaryBody.appendChild(tr);
     }
   });
@@ -366,45 +370,56 @@ function generatePDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-    const userName = prompt("Enter your Name:", "");
-    const userRole = prompt("Enter your Role:", "");
+  const userName = prompt("Enter your Name:", "");
+  const userRole = prompt("Enter your Role:", "");
 
-    doc.setFontSize(25);
-    doc.setFont("helvetica", "bold");
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const title = "Work Hours Summary Report";
-    const textWidth = doc.getTextWidth(title);
-    const xPos = (pageWidth - textWidth) / 2;
-    doc.text(title, xPos, 20);
+  // Title
+  doc.setFontSize(30);
+  doc.setFont("helvetica", "bold");
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const title = "Work Hours Summary Report";
+  const textWidth = doc.getTextWidth(title);
+  const xPos = (pageWidth - textWidth) / 2;
+  doc.text(title, xPos, 20);
 
-    doc.setFontSize(12);
-    doc.text(`Name: ${userName}`, 14, 30);
-    doc.text(`Role: ${userRole}`, 14, 38);
+  // User info
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Name: ${userName}`, 14, 30);
+  doc.text(`Role: ${userRole}`, 14, 38);
 
-    const totalHours = calculateTotal();
-    const formattedTotal = formatHoursToHM(totalHours);
+  // Table
+  const totalHours = calculateTotal();
+  const formattedTotal = formatHoursToHM(totalHours);
 
-    doc.autoTable({
-      html: '#summaryTable',
-      startY: 50
-    });
+  doc.autoTable({
+    html: '#summaryTable',
+    startY: 50,
+    headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] }, 
+    bodyStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] }, 
+  });
 
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Total: ${formattedTotal}`, 14, doc.lastAutoTable.finalY + 10);
+  // Total
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total: ${formattedTotal}`, 14, doc.lastAutoTable.finalY + 10);
 
-    const now = new Date();
-    const dateStr = now.toLocaleString();
-    doc.setFontSize(10);
-    doc.text(`Generated: ${dateStr}`, 14, doc.internal.pageSize.height - 10);
+  // Footer (centered)
+  const now = new Date();
+  const dateStr = now.toLocaleString();
+  doc.setFontSize(10);
+  const footerText = `Generated: ${dateStr}`;
+  const footerWidth = doc.getTextWidth(footerText);
+  const footerX = (pageWidth - footerWidth) / 2;
+  doc.text(footerText, footerX, doc.internal.pageSize.height - 10);
 
-    const safeName = userName.replace(/\s+/g, "_");
-    const fileDate = now.toISOString().split("T")[0];
-    const fileName = `${safeName}_Work_Hours_Summary_${fileDate}.pdf`;
+  // File name
+  const safeName = userName.replace(/\s+/g, "_");
+  const fileDate = now.toISOString().split("T")[0];
+  const fileName = `${safeName}_Work_Hours_Summary_${fileDate}.pdf`;
 
-    doc.save(fileName);
-  }
-
+  doc.save(fileName);
+}
   </script>
 </body>
 </html>
