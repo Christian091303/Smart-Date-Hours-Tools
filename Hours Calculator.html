@@ -289,30 +289,6 @@ function addRow() {
     container.removeChild(row);
   });
 
-  const startInput = row.querySelector(".start");
-  const endInput = row.querySelector(".end");
-
-  startInput.addEventListener("change", () => {
-    if (startInput.value) {
-      const [hour] = startInput.value.split(":");
-      let h = parseInt(hour, 10);
-     
-      if (h < 12) {
-       
-        if (endInput.value) {
-          let [eh, em] = endInput.value.split(":");
-          endInput.value = `${(parseInt(eh, 10) + 12) % 24}:${em}`;
-        }
-      } else {
-       
-        if (endInput.value) {
-          let [eh, em] = endInput.value.split(":");
-          endInput.value = `${(parseInt(eh, 10) + 12) % 24}:${em}`;
-        }
-      }
-    }
-  });
-  
   container.appendChild(row);
 }
 
